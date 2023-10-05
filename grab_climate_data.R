@@ -63,7 +63,7 @@ combined.weather.stations %>%
 
 
 
-bands = 20
+bands = 40
 colours = 7
 
 min.year = 1923
@@ -82,14 +82,53 @@ graph <- combined.weather.stations %>%
 colour_spectrum = c("#17375c","#558ed5","#c4d6ee","#efefef","#f2dddc","#d79593","#943735")
 
 
-temp.mapping <- tibble(colour.bucket = levels(graph$colour.bucket), colour_spectrum = colour_spectrum)
+temp.mapping <- tibble(colour.bucket = levels(graph$colour.bucket), colour_fill = colour_spectrum) %>% 
+  arrange(ifelse(colour.bucket=="[18.3,18.7]","(00",colour.bucket)) %>% 
+  mutate(n=row_number())
 
 
-graph <- graph %>% left_join(.,temp.mapping, by=c("colour.bucket"))
+#Create swatch.
 
+ggplot(data=temp.mapping, aes(x = n, y = 1, fill = temp.mapping$colour_fill)) + 
+  geom_bar(stat="identity", fill = temp.mapping$colour_fill) +
+  coord_cartesian(ylim=c(0, 1)) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  ylab("") +
+  xlab("")
 
+ggsave("colour_gradient.png")
+
+graph.out <- graph %>% left_join(.,temp.mapping, by=c("colour.bucket"))
 
 
 # Create Colour Bands ----
+
+ggplot(data=graph.out, aes(x = period, y = ave_max, fill = graph.out$colour_fill)) + 
+  geom_bar(stat="identity", fill = graph.out$colour_fill) +
+  coord_cartesian(ylim=c(0, 1)) +
+  theme(#axis.text.x = element_text(angle = 90),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
+  ylab("") +
+  xlab("")
+
+ggsave("temp_history.png")
+
+
+
+
 
      
