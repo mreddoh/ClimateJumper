@@ -128,7 +128,30 @@ ggplot(data=graph.out, aes(x = period, y = ave_max, fill = graph.out$colour_fill
 ggsave("temp_history.png")
 
 
+midpoint = graph %>% summarise(mx = max(ave_max), mn = min(ave_max)) %>% mutate(midpoint = mn + ((mx-mn)/2)) %>% select(midpoint) %>% pull()
+
+
+graph.out %>% 
+  mutate(adj.bar = ave_max - midpoint) %>% 
+  ggplot(data=., aes(x = fct_rev(period), y = adj.bar, fill = graph.out$colour_fill)) + 
+    geom_col(fill = graph.out$colour_fill) +
+    coord_flip() +
+    theme(#axis.text.x = element_text(angle = 90),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank(),
+      panel.background = element_blank()) +
+    ylab("") +
+    xlab("")
+
+ggsave("jumper_design.png")
 
 
 
-     
+
+
+
